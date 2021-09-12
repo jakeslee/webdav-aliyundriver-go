@@ -130,6 +130,44 @@ func (o LockedObject) RemoveTempLockedObject() {
 	}
 }
 
+func (o LockedObject) RemoveLockedObjectOwner(owner string) {
+	if (this != _resourceLocks._tempRoot) {
+		// removing from tree
+		if (_parent != null && _parent._children != null) {
+			int size = _parent._children.length;
+			for (int i = 0; i < size; i++) {
+				if (_parent._children[i].equals(this)) {
+					LockedObject[] newChildren = new LockedObject[size - 1];
+					for (int i2 = 0; i2 < (size - 1); i2++) {
+						if (i2 < i) {
+							newChildren[i2] = _parent._children[i2];
+						} else {
+							newChildren[i2] = _parent._children[i2 + 1];
+						}
+					}
+					if (newChildren.length != 0) {
+						_parent._children = newChildren;
+					} else {
+						_parent._children = null;
+					}
+					break;
+				}
+			}
+
+			// removing from hashtable
+			_resourceLocks._tempLocksByID.remove(getID());
+			_resourceLocks._tempLocks.remove(getPath());
+
+			// now the garbage collector has some work to do
+		}
+	}
+}
+
+func (o LockedObject) RemoveLockedObject() {
+
+
+}
+
 func CreateLockedObject(resLocks ResourceLocks, path string, temporary bool) LockedObject {
 	lockedObject := LockedObject{
 		Path:         path,
